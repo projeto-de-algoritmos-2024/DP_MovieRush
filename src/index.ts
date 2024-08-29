@@ -191,7 +191,25 @@ app.get('/api/schedule', async (req: Request, res: Response) => {
     return biggestScheduleSize;
 
   }
+  const schedule = [];
+  function find_Schedule(previousMovieInSchedule : Record<number, number>, index: number, cinemaDurationData: CinemaDurationData[]) {
+    if(index == 0){
+      return
+    }
+    else{
+      schedule.push(cinemaDurationData[index].title);
+      find_Schedule(previousMovieInSchedule, previousMovieInSchedule[index], cinemaDurationData);
+    }
+  }
 
+  function getSchedule(size: number,scheduleSize : Record<number, number>, cinemaDurationData: CinemaDurationData[], biggestScheduleSize: number) {
+    let j = 0;
+    while (scheduleSize[j] < biggestScheduleSize) {
+      j++;
+    } 
+    const simpleTheBest = find_Schedule(previousMovieInSchedule, j, cinemaDurationData);
+    return simpleTheBest;
+  }
 
   
 
