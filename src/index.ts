@@ -160,6 +160,41 @@ app.get('/api/schedule', async (req: Request, res: Response) => {
       return agenda;
     };
 
+
+    let scheduleSize:Record<number, number> = {
+      0: 0,
+    };
+    let previousMovieInSchedule:Record<number, number> = {
+      0: 0,
+    };
+
+    function findBiggestScheduleSize(cinemaDurationData: CinemaDurationData[] ): number {
+
+      for (let j = 0; j < cinemaDurationData.length; j++) {
+        scheduleSize[j] = 1;
+        previousMovieInSchedule[j] = 0;
+
+        for(let i = 0; i < j; i++) {
+            if(cinemaDurationData[i].times[0].end.getTime() < cinemaDurationData[j].times[0].start.getTime() && (1 +  scheduleSize[i] > scheduleSize[j] )) {
+                scheduleSize[j] = 1 + scheduleSize[i];
+                previousMovieInSchedule[j] = i;
+            }
+        }
+    }
+
+    let biggestScheduleSize = 0;
+
+    for (let i = 0; i < cinemaDurationData.length; i++) {
+      biggestScheduleSize = scheduleSize[i] > biggestScheduleSize ? scheduleSize[i] : biggestScheduleSize;
+    }
+
+    return biggestScheduleSize;
+
+  }
+
+
+  
+
     const scheduledMovies = intervalScheduler(movieTimesWithEndTime);
 
     await browser.close();
