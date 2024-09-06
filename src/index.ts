@@ -150,7 +150,7 @@ app.get('/api/schedule', async (req: Request, res: Response) => {
           (agenda.length === 0 || currentMovie.start.getTime() >= agenda[agenda.length - 1].end.getTime()) 
         ) {
 
-          if (repeat === "true" || !watchedStatus[currentMovie.title]) {
+          if (!watchedStatus[currentMovie.title]) {
             agenda.push(currentMovie);
             watchedStatus[currentMovie.title] = true;
           }
@@ -213,7 +213,7 @@ app.get('/api/schedule', async (req: Request, res: Response) => {
 
   
 
-    const scheduledMovies = intervalScheduler(movieTimesWithEndTime);
+    const scheduledMovies = repeat ? intervalScheduler(movieTimesWithEndTime) : findBiggestScheduleSize(movieTimesWithEndTime);
 
     await browser.close();
     res.json(scheduledMovies);
