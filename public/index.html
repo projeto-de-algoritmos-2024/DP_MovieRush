@@ -1,97 +1,277 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Rush</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #000428 0%, #004e92 50%, #0f1c3f 100%);
+            color: #f9f9f9;
             margin: 0;
             padding: 0;
+            text-align: center;
+            overflow: hidden;
+            background-size: 400% 400%;
+            animation: backgroundShift 15s ease infinite;
         }
+
+        @keyframes backgroundShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
         .container {
-            max-width: 800px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1.5s ease-out forwards;
+            animation-delay: 2.5s;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            margin-top: 20px;
         }
+
+        .content-wrapper {
+            padding: 0 40px;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .title {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            font-weight: bold;
+            opacity: 0;
+            animation: titleMove 3s ease forwards;
+        }
+
+        @keyframes titleMove {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            80% {
+                opacity: 1;
+                transform: translate(-50%, -300px) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -300px) scale(1);
+            }
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeTitle 2.5s ease forwards;
+            animation-delay: 2.5s;
+        }
+
+        @keyframes fadeTitle {
+            to {
+                opacity: 1;
+            }
+        }
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
+
+        select, input[type="checkbox"] {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #192133;
+            color: #f9f9f9;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #0072d2;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #005bb5;
+        }
+
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
         #agenda {
+            position: relative;
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .loader {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin: 0 auto;
             margin-top: 20px;
         }
-        .movie {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            display: flex;
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message-card {
+            display: none;
+            flex-direction: column;
             align-items: center;
-            background-color: #f9f9f9;
-            border-radius: 8px;
+            justify-content: center;
+            background-color: rgba(255, 0, 0, 0.1);
+            border: 2px solid rgba(255, 0, 0, 0.5);
+            color: #ff4d4d;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .error-message-card i {
+            font-size: 50px;
+            margin-bottom: 10px;
+            color: #ff4d4d;
+        }
+
+        .error-message-text {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .movie {
+            background-color: #1f2a48;
+            border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: movieFadeIn 0.5s ease forwards;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease;
         }
+
+        @keyframes movieFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .movie img {
-            width: 100px;
-            height: 150px;
-            object-fit: cover;
-            margin-right: 15px;
-            border-radius: 4px;
+            width: 100%;
+            height: auto;
+            display: block;
+            border-bottom: 4px solid #0072d2;
         }
+
         .movie-details {
-            flex: 1;
+            padding: 15px;
         }
+
         .movie-title {
             font-size: 18px;
             font-weight: bold;
             margin: 0;
         }
+
         .movie-time {
             font-size: 14px;
-            color: #666;
+            color: #bbb;
+            margin-top: 8px;
         }
-        button {
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
+
+        .movie-time span {
+            display: block;
             font-size: 16px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s;
+            color: #f9f9f9;
+            font-weight: bold;
+            margin-top: 8px;
         }
-        button:hover {
-            background-color: #0056b3;
+
+        .movie:hover {
+            box-shadow: 0 0 20px 5px rgba(0, 123, 255, 0.7);
         }
+
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Movie Rush</h1>
-        <div class="form-group">
-            <label for="cinema">Escolha o cinema:</label>
-            <select id="cinema">
-                <option value="" disabled selected>Escolha o cinema</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="day">Escolha um dia:</label>
-            <select id="day">
-                <option value="" disabled selected>Escolha um dia</option>
-            </select>
-        </div>
+    <div class="title">Movie Rush</div>
 
-        <div class="form-group">
-            <input type="checkbox" id="repeat" name="repeat" value="true" checked>
-            <label for="repeat">Repetir filmes</label>
-        </div>
-        <button id="fetchSchedule">Gerar agenda</button>
-        <div id="agenda">
+    <div class="container">
+        <div class="content-wrapper">
+            <h1>Movie Rush</h1>
+            <div class="form-group">
+                <label for="cinema">Escolha o cinema:</label>
+                <select id="cinema" disabled>
+                    <option value="" disabled selected>Escolha o cinema</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="day">Escolha um dia:</label>
+                <select id="day" disabled>
+                    <option value="" disabled selected>Escolha um dia</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <input type="checkbox" id="repeat" name="repeat" value="true" checked>
+                <label for="repeat">Repetir filmes</label>
+            </div>
+            <button id="fetchSchedule" disabled>Gerar agenda</button>
+
+            <div class="loader" id="loader"></div>
+
+             <div class="error-message-card" id="errorMessage">
+                <i class="fas fa-exclamation-circle"></i>
+                <div class="error-message-text">Não há filmes disponíveis neste cinema.</div>
+            </div>
+
+            <div id="agenda"></div>
         </div>
     </div>
 
@@ -101,8 +281,23 @@
         const fetchScheduleButton = document.getElementById('fetchSchedule');
         const agendaContainer = document.getElementById('agenda');
         const repeatCheckbox = document.getElementById('repeat');
+        const errorMessage = document.getElementById('errorMessage');
+        const loader = document.getElementById('loader');
+        let isLoading = false;
+
+        const expectedDays = ["hoj","seg", "ter", "qua", "qui", "sex", "sab", "dom"];
+        const today = new Date().toISOString().split('T')[0];
+
+        function setLoadingState(loading) {
+            isLoading = loading;
+            loader.style.display = loading ? 'block' : 'none';
+            cinemaSelect.disabled = loading;
+            daySelect.disabled = loading || !cinemaSelect.value;
+            fetchScheduleButton.disabled = loading || !cinemaSelect.value || !daySelect.value;
+        }
 
         async function fetchCinemas() {
+            setLoadingState(true);
             try {
                 const response = await fetch('http://localhost:3000/api/cinemas');
                 if (!response.ok) {
@@ -111,18 +306,24 @@
                 const cinemas = await response.json();
                 console.log(cinemas);
 
+                cinemaSelect.innerHTML = '<option value="" disabled selected>Escolha o cinema</option>';
                 cinemas.forEach(cinema => {
                     const option = document.createElement('option');
                     option.value = cinema.link;
                     option.textContent = cinema.name;
                     cinemaSelect.appendChild(option);
                 });
+
+                cinemaSelect.disabled = false;
             } catch (error) {
                 console.error('Error fetching cinemas:', error);
+            } finally {
+                setLoadingState(false);
             }
         }
 
         async function fetchAvailableDays(cinemaLink) {
+            setLoadingState(true);
             try {
                 const response = await fetch(`http://localhost:3000/api/cinema/avaliable_days?cinema=${encodeURIComponent(cinemaLink)}`);
                 if (!response.ok) {
@@ -131,16 +332,34 @@
                 const days = await response.json();
                 console.log(days);
 
-                daySelect.innerHTML = '<option value="" disabled selected>Select a day</option>';
+                daySelect.innerHTML = '<option value="" disabled selected>Escolha um dia</option>';
 
-                days.forEach(day => {
-                    const option = document.createElement('option');
-                    option.value = day.index;
-                    option.textContent = day.date;
-                    daySelect.appendChild(option);
+                agendaContainer.innerHTML = '';
+
+                const availableDays = days.filter(day => {
+                    const dayName = day.date.toLowerCase().slice(0, 3);
+                    console.log(dayName, day);
+                    return expectedDays.includes(dayName) || day.date === today;
                 });
+
+                if (availableDays.length > 0) {
+                    errorMessage.style.display = 'none';
+                    availableDays.forEach(day => {
+                        const option = document.createElement('option');
+                        option.value = day.index;
+                        option.textContent = day.date === today ? "Hoje" : day.date;
+                        daySelect.appendChild(option);
+                    });
+
+                    daySelect.disabled = false;
+                } else {
+                    daySelect.disabled = true;
+                    errorMessage.style.display = 'flex';
+                }
             } catch (error) {
                 console.error('Error fetching available days:', error);
+            } finally {
+                setLoadingState(false);
             }
         }
 
@@ -150,10 +369,11 @@
             const repeat = repeatCheckbox.checked;
 
             if (!cinemaLink || !day) {
-                alert('Please select both cinema and day.');
+                alert('Por favor, selecione o cinema e o dia.');
                 return;
             }
 
+            setLoadingState(true);
             try {
                 const response = await fetch(`http://localhost:3000/api/schedule?cinema=${encodeURIComponent(cinemaLink)}&day=${day}&repeat=${repeat}`);
                 if (!response.ok) {
@@ -162,27 +382,41 @@
                 const schedule = await response.json();
 
                 agendaContainer.innerHTML = '';
-                schedule.forEach(movie => {
+
+                schedule.forEach((movie, index) => {
                     const movieDiv = document.createElement('div');
                     movieDiv.className = 'movie';
+                    movieDiv.style.animationDelay = `${index * 0.1}s`;
                     movieDiv.innerHTML = `
                         <img src="${movie.img}" alt="${movie.title}">
                         <div class="movie-details">
                             <h3 class="movie-title">${movie.title}</h3>
-                            <p class="movie-time">Start: ${new Date(movie.start).toLocaleTimeString()}</p>
-                            <p class="movie-time">End: ${new Date(movie.end).toLocaleTimeString()}</p>
+                            <p class="movie-time"><span>Início:</span> ${new Date(movie.start).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+                            <p class="movie-time"><span>Fim:</span> ${new Date(movie.end).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
                         </div>
                     `;
+
+                    movieDiv.addEventListener('click', () => {
+                        const query = encodeURIComponent(movie.title);
+                        window.open(`https://www.google.com/search?q=${query}`, '_blank');
+                    });
+
                     agendaContainer.appendChild(movieDiv);
                 });
             } catch (error) {
                 console.error('Error fetching schedule:', error);
+            } finally {
+                setLoadingState(false);
             }
         }
 
         cinemaSelect.addEventListener('change', (event) => {
             const cinemaLink = event.target.value;
             fetchAvailableDays(cinemaLink);
+        });
+
+        daySelect.addEventListener('change', () => {
+            fetchScheduleButton.disabled = !cinemaSelect.value || !daySelect.value;
         });
 
         fetchScheduleButton.addEventListener('click', fetchSchedule);

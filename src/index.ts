@@ -131,7 +131,7 @@ app.get('/api/schedule', async (req: Request, res: Response) => {
       return { title, duration, times: calculateEndTime(duration, times), img };
     });
 
-    const intervalScheduler = (cinemaDurationData: CinemaDurationData[]) => {
+    const intervalScheduler = (cinemaDurationData: CinemaDurationData[], repeat: boolean) => {
       const agenda: Schedule[] = [];
       const allMovies: Schedule[] = [];
       const watchedStatus: Record<string, boolean> = {};
@@ -146,11 +146,9 @@ app.get('/api/schedule', async (req: Request, res: Response) => {
 
       for (let i = 0; i < allMovies.length; i++) {
         const currentMovie = allMovies[i];
-        if (
-          (agenda.length === 0 || currentMovie.start.getTime() >= agenda[agenda.length - 1].end.getTime()) 
-        ) {
+        if (agenda.length === 0 || currentMovie.start.getTime() >= agenda[agenda.length - 1].end.getTime()) {
 
-          if (!watchedStatus[currentMovie.title]) {
+          if (repeat || !watchedStatus[currentMovie.title]) {
             agenda.push(currentMovie);
             watchedStatus[currentMovie.title] = true;
           }
@@ -160,60 +158,7 @@ app.get('/api/schedule', async (req: Request, res: Response) => {
       return agenda;
     };
 
-
-    let scheduleSize:Record<number, number> = {
-      0: 0,
-    };
-    let previousMovieInSchedule:Record<number, number> = {
-      0: 0,
-    };
-
-    function findBiggestScheduleSize(cinemaDurationData: CinemaDurationData[] ): number {
-
-      for (let j = 0; j < cinemaDurationData.length; j++) {
-        scheduleSize[j] = 1;
-        previousMovieInSchedule[j] = 0;
-
-        for(let i = 0; i < j; i++) {
-            if(cinemaDurationData[i].times[0].end.getTime() < cinemaDurationData[j].times[0].start.getTime() && (1 +  scheduleSize[i] > scheduleSize[j] )) {
-                scheduleSize[j] = 1 + scheduleSize[i];
-                previousMovieInSchedule[j] = i;
-            }
-        }
-    }
-
-    let biggestScheduleSize = 0;
-
-    for (let i = 0; i < cinemaDurationData.length; i++) {
-      biggestScheduleSize = scheduleSize[i] > biggestScheduleSize ? scheduleSize[i] : biggestScheduleSize;
-    }
-
-    return biggestScheduleSize;
-
-  }
-  const schedule = [];
-  function find_Schedule(previousMovieInSchedule : Record<number, number>, index: number, cinemaDurationData: CinemaDurationData[]) {
-    if(index == 0){
-      return
-    }
-    else{
-      schedule.push(cinemaDurationData[index].title);
-      find_Schedule(previousMovieInSchedule, previousMovieInSchedule[index], cinemaDurationData);
-    }
-  }
-
-  function getSchedule(size: number,scheduleSize : Record<number, number>, cinemaDurationData: CinemaDurationData[], biggestScheduleSize: number) {
-    let j = 0;
-    while (scheduleSize[j] < biggestScheduleSize) {
-      j++;
-    } 
-    const simpleTheBest = find_Schedule(previousMovieInSchedule, j, cinemaDurationData);
-    return simpleTheBest;
-  }
-
-  
-
-    const scheduledMovies = repeat ? intervalScheduler(movieTimesWithEndTime) : findBiggestScheduleSize(movieTimesWithEndTime);
+    const scheduledMovies = intervalScheduler(movieTimesWithEndTime, repeat === 'true');
 
     await browser.close();
     res.json(scheduledMovies);
